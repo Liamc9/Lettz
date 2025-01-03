@@ -1,58 +1,74 @@
-
-const functions = require("firebase-functions/v1");
-const dotenv = require("dotenv");
-dotenv.config();
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const express = require("express");
-const app = express();
+const {
+  onCall,
+  HttpsError,
+} = require("firebase-functions/v2/https");
 const cors = require("cors")({origin: true}); // Enable CORS for all origins
-app.use(cors);
 const admin = require("firebase-admin");
+const express = require("express");
+const axios = require("axios");
+
+const app = express();
+app.use(cors);
 admin.initializeApp();
 
-// Payment Intent Function with Customer
-// Creation/Attachment and Payment Method Attachment
-exports.createPaymentIntentWithCustomer = functions
-    .https.onRequest((req, res) => {
-      cors(req, res, async () => {
-        try {
-          const {amount, email, createCustomer, attachPaymentMethod,
-            currency, destinationAccount} = req.body;
 
-          let customer;
+// EXAMPLE OF ONCALL FUNCTION WITH DEBUGGING
+exports.getLocation = onCall(async (request) => {
+  const data = request.data;
+  const eircode = data.eircode;
 
-          if (createCustomer && email) {
-            // Check if the customer already exists
-            const existingCustomers = await stripe.customers.list({
-              email: email,
-              limit: 1,
-            });
+  // Log the received eircode
+  console.log("Received eircode:", eircode);
+  console.log("Received data:", data);
 
-            if (existingCustomers.data.length > 0) {
-              customer = existingCustomers.data[0];
-            } else {
-              // Create a new customer if not existing
-              customer = await stripe.customers.create({
-                email: email,
-              });
-            }
-          }
+  // Access the Maps API Key from environment variables
+  const mapsKey = process.env.MAPS_API_KEY;
 
-          // Create the payment intent
-          const paymentIntent = await stripe.paymentIntents.create({
-            amount: amount, // Amount in cents
-            currency: currency || "usd", // Use provided currency, default USD
-            customer: customer ? customer.id : undefined, // Attach customer
-            setup_future_usage: attachPaymentMethod ? "off_session" : undefined,
-            transfer_data: destinationAccount ?
-            {destination: destinationAccount} : undefined, // Dest account
+  // Log the Maps API Key status (do not log the key itself for security)
+  if (!mapsKey) {
+    console.error("Maps API Key is not configured.");
+    throw new HttpsError("failed-precondition"
+        , "Maps API key is not configured.");
+  } else {
+    console.log("Maps API Key is configured.");
+  }
 
-          });
+  try {
+    // Construct the Google Maps Geocoding API URL with query parameters
+    const geocodeURL =`https://maps.googleapis.com/maps/api/geocode/json`;
+    console.log("Geocoding API URL:", geocodeURL);
+    console.log("Query Parameters:", {address: eircode, key: "REDACTED"});
 
-          res.status(200).send({clientSecret: paymentIntent.client_secret});
-        } catch (error) {
-          console.error("Error creating Stripe PaymentIntent:", error);
-          res.status(500).send({error: error.message});
-        }
-      });
-    });
+    // Make the request to the Google Maps Geocoding API
+    const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${eircode}&key=${mapsKey}`);
+
+    // Log the full response data
+    console.log("Google Maps API Response:", response.data);
+
+    // Check if results are available
+    const results = response.data.results;
+    if (!results || results.length === 0) {
+      console.warn(`No results found for eircode: ${eircode}`);
+      throw new HttpsError("not-found", `No re
+        sults found for eircode: ${eircode}`);
+    }
+
+    // Extract location from the first result
+    const location = results[0].geometry.location;
+    console.log("Extracted Location:", location);
+
+    // Return the latitude and longitude
+    return {lat: location.lat, lng: location.lng};
+  } catch (error) {
+    // Log the error details
+    console.error("Error fetching coordinates:", error);
+
+    // If the error is already an HttpsError, rethrow it
+    if (error instanceof HttpsError) {
+      throw error;
+    }
+
+    // Otherwise, throw a new internal error
+    throw new HttpsError("internal", "Failed to fetch coordinates.");
+  }
+});
