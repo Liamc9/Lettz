@@ -8,7 +8,7 @@ const MapWithMarker = ({ eircode }) => {
   const [marker, setMarker] = useState(null);
   const [user, setUser] = useState(null);
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyCzlSg0XhNmPVPOZcgWWWm_bZcnMr7zPRc", // Replace with your actual API key
+    googleMapsApiKey: "AIzaSyAIRbf2TllYWSlRZasuVy7z623xajzkt_U", // Replace with your actual API key
   });
 
   const functions = getFunctions();

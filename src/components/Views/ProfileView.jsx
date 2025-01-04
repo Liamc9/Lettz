@@ -155,7 +155,6 @@ const ProfileView = ({
   setNewProfilePicFile,
   newProfilePicFile,
 }) => {
-  const navigate = useNavigate();
 
   const handleProfilePicSelect = (e) => {
     const file = e.target.files[0];
@@ -163,12 +162,6 @@ const ProfileView = ({
       const validTypes = ["image/jpeg", "image/png", "image/gif"];
       if (!validTypes.includes(file.type)) {
         toast.error("Only JPEG, PNG, and GIF files are allowed.");
-        return;
-      }
-
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        toast.error("File size exceeds 5MB.");
         return;
       }
 

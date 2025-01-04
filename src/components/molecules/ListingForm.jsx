@@ -440,13 +440,10 @@ const PrevButton = styled.button`
   cursor: pointer;
   border: none;
   border-radius: 4px;
-  background-color: #d1d5db; /* Gray background */
+  background-color: #000000; /* Gray background */
   color: #fff;
   transition: background-color 0.2s;
 
-  &:hover {
-    background-color: #a1a1aa; /* Darker gray on hover */
-  }
 
 `;
 

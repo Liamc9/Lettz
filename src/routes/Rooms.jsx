@@ -10,7 +10,7 @@ import RoomsView from "../components/Views/RoomsView";
 
 const Rooms = () => {
   const { id } = useParams(); // Extract the `id` from the URL parameters
-  const { currentUser } = useAuth(); // Access the current user from AuthContext
+  const { currentUser, userData } = useAuth(); // Access the current user from AuthContext
   const [roomData, setRoomData] = useState(null);
 
   const [roomSnapshot, roomLoading, roomError] = useDocument(
@@ -145,6 +145,7 @@ console.log(roomData)
       handleSend={handleSend}
       currentUser={currentUser}
       id={id}
+      userData={userData}
     />
   );
 };

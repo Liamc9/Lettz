@@ -9,55 +9,47 @@ const Container = styled.div`
   max-width: 28rem; /* Equivalent to max-w-md */
   padding: 1rem;
 `;
-
 const Header = styled.div`
+  width: 100%;
   display: flex;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 50px;
 `;
-
-const BackButton = styled.button`
-  display: flex;
-  align-items: center;
-  background: none;
-  border: none;
-  color: #000;
-  cursor: pointer;
-  font-size: 1rem;
-  margin-right: 0.5rem;
-
-  &:hover {
-    opacity: 0.8;
-  }
-`;
-
 const Title = styled.h1`
-  font-size: 1.25rem; /* Equivalent to text-xl */
+  font-size: 1.8rem; /* Equivalent to text-xl */
   font-weight: 600; /* Equivalent to font-semibold */
   color: #333; /* Equivalent to text-gray-800 */
   margin: 0;
+  margin-left: 4rem;
 `;
 
-const DeleteButton = styled.button`
-  width: 100%;
-  background-color: #ef4444; /* Equivalent to bg-red-500 */
-  color: white;
-  padding: 0.75rem; /* Equivalent to py-3 */
-  border-radius: 0.375rem; /* Equivalent to rounded-md */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Equivalent to shadow-md */
-  border: none;
-  cursor: not-allowed;
-  margin-top: 1.5rem; /* Equivalent to mt-6 */
+const BackButton = styled.button`
+  position: absolute;
+  top: 20px; /* Adjust as needed */
+  left: 20px; /* Adjust as needed */
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e0e0e0;
+  padding: 5px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 50; /* Ensure it's above the conversation content */
 
-  &:hover {
-    background-color: #dc2626; /* Equivalent to hover:bg-red-600 */
+  svg {
+    width: 24px;
+    height: 24px;
   }
 `;
+
 
 const ManageNotifications = () => {
   const [notifications, setNotifications] = useState(true);
 
-  const navigate = useNavigate();
 
   const accountItems = [
   
@@ -65,38 +57,33 @@ const ManageNotifications = () => {
       type: 'ToggleField',
       props: {
         icon: UserIcon2,
-        name: 'Enable Notifications',
+        name: 'Email Notifications',
         value: notifications,
         onChange: setNotifications,
       },
     },
   ];
 
-  const handleDeleteAccount = () => {
-    console.log('Delete account clicked');
+
+
+  const handleBackClick = () => {
+    window.history.back();
   };
 
-  const handleBack = () => {
-    navigate('/settings');
-  };
 
   return (
     <Container>
       {/* Header with Back Button and Title */}
       <Header>
-        <BackButton onClick={handleBack}>
-          <ChevronLeftIcon className="w-6 h-6" />
-        </BackButton>
+        <BackButton onClick={handleBackClick} aria-label="Go back to settings">
+                  <ChevronLeftIcon />
+                </BackButton>
         <Title>Manage Account</Title>
       </Header>
 
       {/* Edit List */}
       <EditStackedList items={accountItems} />
 
-      {/* Delete Button */}
-      <DeleteButton onClick={handleDeleteAccount} disabled>
-        Delete Account
-      </DeleteButton>
     </Container>
   );
 };

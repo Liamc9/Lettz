@@ -256,35 +256,20 @@ const RoomsView = ({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false); // State for Profile Modal
   const navigate = useNavigate();
+  const profileComplete = userData?.profileComplete || false;
 
   if (!roomData) {
     return <ErrorContainer>Room not found.</ErrorContainer>;
   }
 
-  // Function to determine if the profile is complete
-  const isProfileComplete = () => {
-    // Define your criteria for profile completeness
-    // For example, check if certain fields are filled out
-    if (!userData) return false;
-    const { name, email, phone } = userData; // Adjust based on your user data structure
-    return name && email && phone; // Example criteria
-  };
-
   const handleSendMessage = () => {
     if (!currentUser) {
-      // Redirect to login if the user is not logged in
       navigate("/login", { state: { from: `/rooms/${id}` } });
-      return;
-    }
-
-    if (!isProfileComplete()) {
-      // Open the profile completion modal if profile is incomplete
+    } else if (!profileComplete) {
       setIsProfileModalOpen(true);
-      return;
+    } else {
+      setIsDrawerOpen(true);
     }
-
-    // Open the message form drawer
-    setIsDrawerOpen(true);
   };
 
   const closeDrawer = () => {

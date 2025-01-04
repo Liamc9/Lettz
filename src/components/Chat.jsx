@@ -12,7 +12,6 @@ const ChatContainer = styled.div`
   width: 100%;
   max-width: 800px; /* Increased width for better readability */
   margin: 0 auto;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
 const LoadingMessage = styled.div`
